@@ -9,11 +9,13 @@ module Nanoc::Filters
     type :text
 
     def run(content, params = {})
-      Zlib::GzipWriter.open(output_filename, Zlib::BEST_COMPRESSION) do |gz|
+      out = StringIO.new
+      Zlib::GzipWriter.wrap(out, Zlib::BEST_COMPRESSION) do |gz|
         gz.orig_name = File.basename(item[:filename])
         gz.mtime = mtime.to_i
         gz.write content
       end
+      out.string
     end
 
     def mtime
